@@ -58,8 +58,6 @@ public class Main
             }
         }
 
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
         boolean result = job.waitForCompletion(true);
 
         System.exit(result ? 0 : 1);
