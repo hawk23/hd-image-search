@@ -11,9 +11,13 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-core</artifactId>
-            <version>1.2.0</version>
-            <scope>provided</scope>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>semanticmetadata.lire</groupId>
+            <artifactId>lire</artifactId>
+            <version>1</version>
         </dependency>
     </dependencies>
 
