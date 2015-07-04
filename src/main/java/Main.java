@@ -2,11 +2,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 
-import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapred.MultiFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
@@ -26,15 +28,14 @@ public class Main
         Job             job     = new Job(conf, "extractFeatures");
 
         job.setJarByClass(Main.class);
+
         job.setMapperClass(ImageFeatureExtractMapper.class);
         job.setReducerClass(ImageFeatureExtractReducer.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-
-        job.setInputFormatClass(KeyValueTextInputFormat.class);
+        job.setInputFormatClass(ImageInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
 
         //get the FileSystem, you will need to initialize it properly
@@ -48,15 +49,16 @@ public class Main
             {
                 if (status.isDir())
                 {
-                    FileStatus[] imagesStatusList = fs.listStatus(status.getPath());
-                    for (FileStatus imageStatus : imagesStatusList)
-                    {
-                        //add each file to the list of inputs for the map-reduce job
-                        FileInputFormat.addInputPath(job, status.getPath());
-                    }
+                    //add each dir to the list of inputs for the map-reduce job
+                    FileInputFormat.addInputPath(job, status.getPath());
+
+                    // HACK --> just process first folder to prevent errors.
+                    break;
                 }
             }
         }
+
+        FileOutputFormat.setOutputPath(job, new Path("/index"));
 
         boolean result = job.waitForCompletion(true);
 
