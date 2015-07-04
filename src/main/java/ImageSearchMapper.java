@@ -1,4 +1,5 @@
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -7,7 +8,7 @@ import java.io.IOException;
 /**
  * Created by mario on 04.07.15.
  */
-public class ImageSearchMapper extends Mapper<Text, Text, Text, LongWritable>
+public class ImageSearchMapper extends Mapper<Text, Text, NullWritable, Text>
 {
     /**
      * gets the image path and feature of an image as input and calculates the difference to the sample image
@@ -32,6 +33,7 @@ public class ImageSearchMapper extends Mapper<Text, Text, Text, LongWritable>
 
         double          distance        = EuclideanDistance.calulate(sampleFeature.getHistogram(), currentFeature.getHistogram());
 
-        context.write(key, new LongWritable((long) distance));
+        // TODO maybe use own Writable
+        context.write(NullWritable.get(), new Text(key + "\t" + distance));
     }
 }

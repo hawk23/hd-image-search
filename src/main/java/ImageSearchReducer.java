@@ -23,10 +23,10 @@ public class ImageSearchReducer extends Reducer<NullWritable, Text, Text, Text>
     @Override
     protected void reduce(NullWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException
     {
-        super.reduce(key, values, context);
 
-        // TODO: find ten best images (lowest distance) and save them as result.
-        TreeMap<Long, String> bestImages = new TreeMap<Long, String>();
+        int numResults = Integer.valueOf(context.getConfiguration().get(ImageSearch.NUM_RESULTS_KEY));
+
+        TreeMap<Double, String> bestImages = new TreeMap<Double, String>();
 
         // iterate over all
         for (Text value : values) {
@@ -34,18 +34,17 @@ public class ImageSearchReducer extends Reducer<NullWritable, Text, Text, Text>
             // value contains filePath and distance
             String v[] = value.toString().split("\t");
             String filePath = v[0];
-            Long distance = Long.parseLong(v[1]);
+            Double distance = Double.parseDouble(v[1]);
 
             bestImages.put(distance, filePath);
 
-            // TODO configure as parameter
-            if (bestImages.size() > 10) {
+            if (bestImages.values().size() > numResults) {
                 bestImages.remove(bestImages.lastKey());
             }
         }
 
         // write only the ten best as output
-        for (Map.Entry<Long, String> image : bestImages.entrySet()) {
+        for (Map.Entry<Double, String> image : bestImages.entrySet()) {
             context.write(new Text(image.getKey().toString()), new Text(image.getValue()));
         }
     }

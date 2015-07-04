@@ -4,6 +4,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -18,6 +19,8 @@ public class ImageSearch
 {
     public static String SAMPLE_HISTOGRAM_KEY   = "sampleHistogram";
     public static String SAMPLE_FILEPATH_KEY    = "sampleFilepath";
+    public static String NUM_RESULTS_KEY        = "numResults";
+    public static int NUM_RESULTS               = 10;
 
     public static void main(String[] args) throws Exception
     {
@@ -33,18 +36,21 @@ public class ImageSearch
 
         conf.set(SAMPLE_HISTOGRAM_KEY, sampleFeature.getHistogramString());
         conf.set(SAMPLE_FILEPATH_KEY, sampleFeature.getFilePath());
+        conf.set(NUM_RESULTS_KEY, String.valueOf(NUM_RESULTS));
 
         Job             job     = Job.getInstance(conf, "extractFeatures");
         job.setJarByClass(ImageSearch.class);
 
+        // use only one reducer
+        job.setNumReduceTasks(1);
         job.setMapperClass(ImageSearchMapper.class);
-        job.setCombinerClass(ImageSearchReducer.class);
+        //job.setCombinerClass(ImageSearchReducer.class);
         job.setReducerClass(ImageSearchReducer.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(LongWritable.class);
+        job.setMapOutputKeyClass(NullWritable.class);
+        job.setMapOutputValueClass(Text.class);
 
         job.setInputFormatClass(KeyValueTextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
