@@ -23,8 +23,6 @@ public class ImageFeatureExtractMapper extends Mapper<NullWritable, BytesWritabl
         // generate ImageFeature
         ImageFeature feature = new ImageFeature(filePath, histogram);
 
-        System.out.println(feature.getHistogramString());
-
         // write filePath as key and double values of histogram as values
         context.write(new Text(feature.getFilePath()), new Text(feature.getHistogramString()));
     }

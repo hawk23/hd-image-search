@@ -47,7 +47,7 @@ public class Main
                 FileInputFormat.addInputPath(job, status.getPath());
 
                 // HACK --> just process first folder to prevent errors.
-                break;
+                // break;
             }
         }
 
