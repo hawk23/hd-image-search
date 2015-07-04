@@ -39,7 +39,7 @@ public class WholeFileRecordReader extends RecordReader<NullWritable, BytesWrita
         FileSystem  fs = FileSystem.get(conf);
         FSDataInputStream in = null;
         try {
-            in = fs.open( split.getPath());
+            in = fs.open(split.getPath());
             IOUtils.readFully(in, result, 0, fileLength);
             currValue.set(result, 0, fileLength);
 
