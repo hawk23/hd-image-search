@@ -23,6 +23,8 @@ public class ImageSearchReducer extends Reducer<NullWritable, Text, Text, Text>
     @Override
     protected void reduce(NullWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException
     {
+        super.reduce(key, values, context);
+
         // TODO: find ten best images (lowest distance) and save them as result.
         TreeMap<Long, String> bestImages = new TreeMap<Long, String>();
 
