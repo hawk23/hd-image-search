@@ -6,28 +6,27 @@ import org.apache.hadoop.fs.Path;
 public class ImageFeature {
 
     private String filePath;
-    private String fileName;
     private double[] histogram;
 
-    public ImageFeature(String filePath, String fileName, double[] histogram) {
+    public ImageFeature(String filePath, double[] histogram) {
         this.filePath = filePath;
-        this.fileName = fileName;
         this.histogram = histogram;
+    }
+
+    public ImageFeature(String filePath, String histogram) {
+        this.filePath = filePath;
+        this.histogram = parseHistogramString(histogram);
     }
 
     public String getFilePath() {
         return filePath;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
     public double[] getHistogram() {
         return histogram;
     }
 
-    public String toString() {
+    public String getHistogramString() {
 
         String doubleValues = "";
 
@@ -36,22 +35,19 @@ public class ImageFeature {
             doubleValues += v + ";";
         }
 
-        return filePath + " " + doubleValues;
+        return doubleValues;
     }
 
-    public static ImageFeature fromString(String line) {
+    private double[] parseHistogramString(String raw) {
 
-        String filePath = line.split(" ")[0];
-        Path path = new Path(filePath);
-        String fileName = path.getName();
+        String[] doubleValues   = raw.split(";");
+        double[] histogram      = new double[doubleValues.length];
 
-        String[] doubleValues = line.split(" ")[1].split(";");
-
-        double[] histogram = new double[doubleValues.length];
         for (int i = 0; i < doubleValues.length; i++) {
+
             histogram[i] = Double.valueOf(doubleValues[i]);
         }
 
-        return new ImageFeature(filePath, fileName, histogram);
+        return histogram;
     }
 }

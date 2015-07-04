@@ -12,6 +12,8 @@ public class ImageSearchReducer extends Reducer<Text, LongWritable, Text, Text>
     @Override
     protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException
     {
+        super.reduce(key, values, context);
+
         // TODO: find ten best images (lowest distance) and save them as result.
     }
 }

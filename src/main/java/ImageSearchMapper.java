@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Created by mario on 04.07.15.
  */
-public class ImageSearchMapper extends Mapper<LongWritable, Text, Text, LongWritable>
+public class ImageSearchMapper extends Mapper<Text, Text, Text, LongWritable>
 {
     /**
      * gets the image path and feature of an image as input and calculates the difference to the sample image
@@ -15,20 +15,23 @@ public class ImageSearchMapper extends Mapper<LongWritable, Text, Text, LongWrit
      * Key: Image path
      * Value: Difference to sample image
      *
-     * @param key the line number of the image feature inside the index file
-     * @param value the extracted image features and the filepath: '[filepath]:[feature]
+     * @param key the filepath of the current image
+     * @param value the extracted image features of the current image
      * @param context
      * @throws IOException
      * @throws InterruptedException
      */
     @Override
-    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
+    protected void map(Text key, Text value, Context context) throws IOException, InterruptedException
     {
-        String      histogramRaw    = context.getConfiguration().get(ImageSearch.SAMPLE_KEY);
-        Double[]    histogram       = new Double[100]; // TODO parse raw
+        String          sampleHistogram = context.getConfiguration().get(ImageSearch.SAMPLE_HISTOGRAM_KEY);
+        String          sampleFilepath  = context.getConfiguration().get(ImageSearch.SAMPLE_FILEPATH_KEY);
 
-        // TODO: calculate difference
+        ImageFeature    sampleFeature   = new ImageFeature(sampleFilepath, sampleHistogram);
+        ImageFeature    currentFeature  = new ImageFeature(key.toString(), value.toString());
 
-        
+        double          distance        = EuclideanDistance.calulate(sampleFeature.getHistogram(), currentFeature.getHistogram());
+
+        context.write(key, new LongWritable((long) distance));
     }
 }

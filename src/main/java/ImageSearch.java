@@ -16,36 +16,23 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
  */
 public class ImageSearch
 {
-    public static String SAMPLE_KEY = "sample";
+    public static String SAMPLE_HISTOGRAM_KEY   = "sampleHistogram";
+    public static String SAMPLE_FILEPATH_KEY    = "sampleFilepath";
 
     public static void main(String[] args) throws Exception
     {
-        // read arguments
         String              sampleFile  = "/images/png2/1/1_i110.png"; // TODO: read from argmuments
         Path                samplePath  = new Path(sampleFile);
-
         Configuration       conf        = new Configuration();
 
-        //get the FileSystem, you will need to initialize it properly
-        FileSystem          fs          = FileSystem.get(conf);
-        FSDataInputStream   in          = null;
+        byte[]              sampleBytes = loadImage(samplePath, conf);
 
-        int                 fileLength  = (int) fs.getFileStatus(samplePath).getLen();
-        byte[]              sampleBytes = new byte[fileLength];
+        // create histogram of sample image
+        HistogramGenerator  histogramGenerator  = new HistogramGenerator();
+        ImageFeature        sampleFeature       = new ImageFeature(sampleFile, histogramGenerator.generate(sampleBytes));
 
-        try
-        {
-            in              = fs.open(samplePath);
-            IOUtils.readFully(in, sampleBytes, 0, fileLength);
-        }
-        finally
-        {
-            IOUtils.closeStream(in);
-        }
-
-        // TODO: create histogram
-
-        conf.set(SAMPLE_KEY, "histogram goes here");
+        conf.set(SAMPLE_HISTOGRAM_KEY, sampleFeature.getHistogramString());
+        conf.set(SAMPLE_FILEPATH_KEY, sampleFeature.getFilePath());
 
         Job             job     = Job.getInstance(conf, "extractFeatures");
         job.setJarByClass(ImageSearch.class);
@@ -68,5 +55,27 @@ public class ImageSearch
         boolean result = job.waitForCompletion(true);
 
         System.exit(result ? 0 : 1);
+    }
+
+    private static byte[] loadImage (Path path, Configuration conf) throws Exception
+    {
+        //get the FileSystem, you will need to initialize it properly
+        FileSystem          fs          = FileSystem.get(conf);
+        FSDataInputStream   in          = null;
+
+        int                 fileLength  = (int) fs.getFileStatus(path).getLen();
+        byte[]              sampleBytes = new byte[fileLength];
+
+        try
+        {
+            in              = fs.open(path);
+            IOUtils.readFully(in, sampleBytes, 0, fileLength);
+        }
+        finally
+        {
+            IOUtils.closeStream(in);
+        }
+
+        return sampleBytes;
     }
 }
