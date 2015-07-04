@@ -1,4 +1,5 @@
 import net.semanticmetadata.lire.imageanalysis.CEDD;
+import net.semanticmetadata.lire.imageanalysis.ColorLayout;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -24,14 +25,16 @@ public class HistogramGenerator {
         }
 
         // extract histogram using LIRE
-        double[] histogram =  extract_cedd(bufferedImage);
+        double[] histogram =  extract_feature(bufferedImage);
 
         return histogram;
     }
 
-    public double[] extract_cedd(BufferedImage bimg) {
-        CEDD sch = new CEDD();
-        sch.extract(bimg);
-        return sch.getDoubleHistogram();
+    public double[] extract_feature(BufferedImage bimg) {
+
+        CEDD feature = new CEDD ();
+        feature.extract(bimg);
+
+        return feature.getDoubleHistogram();
     }
 }
