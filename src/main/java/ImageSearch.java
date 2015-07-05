@@ -49,7 +49,6 @@ public class ImageSearch
         // use only one reducer
         job.setNumReduceTasks(1);
         job.setMapperClass(ImageSearchMapper.class);
-        //job.setCombinerClass(ImageSearchReducer.class);
         job.setReducerClass(ImageSearchReducer.class);
 
         job.setOutputKeyClass(Text.class);
