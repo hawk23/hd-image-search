@@ -4,6 +4,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,7 +28,7 @@ public class ImageSearchReducer extends Reducer<NullWritable, Text, Text, Text>
 
         int numResults = Integer.valueOf(context.getConfiguration().get(ImageSearch.NUM_RESULTS_KEY));
 
-        TreeMap<Double, String> bestImages = new TreeMap<Double, String>();
+        TreeMap<Double, List<String>> bestImages = new TreeMap<Double, List<String>>();
 
         // iterate over all
         for (Text value : values) {
@@ -36,16 +38,34 @@ public class ImageSearchReducer extends Reducer<NullWritable, Text, Text, Text>
             String filePath = v[0];
             Double distance = Double.parseDouble(v[1]);
 
-            bestImages.put(distance, filePath);
+            if (bestImages.containsKey(distance)) {
+                bestImages.get(distance).add(filePath);
+            } else {
+                List<String> filePathValues = new ArrayList<String>();
+                filePathValues.add(filePath);
+                bestImages.put(distance, filePathValues);
+            }
 
-            if (bestImages.values().size() > numResults) {
-                bestImages.remove(bestImages.lastKey());
+            int currentResultSize = 0;
+            for (List<String> filePathValues : bestImages.values()) {
+                currentResultSize += filePathValues.size();
+            }
+
+            if (currentResultSize > numResults) {
+                // remove last key entry if only one filePathValue else remove one of the filePathValues for the last key
+                if (bestImages.lastEntry().getValue().size() == 1) {
+                    bestImages.remove(bestImages.lastKey());
+                } else {
+                    bestImages.get(bestImages.lastKey()).remove(bestImages.get(bestImages.lastKey()).size() - 1);
+                }
             }
         }
 
         // write only the ten best as output
-        for (Map.Entry<Double, String> image : bestImages.entrySet()) {
-            context.write(new Text(image.getKey().toString()), new Text(image.getValue()));
+        for (Map.Entry<Double, List<String>> entry : bestImages.entrySet()) {
+            for (String filePath : entry.getValue()) {
+                context.write(new Text(entry.getKey().toString()), new Text(filePath));
+            }
         }
     }
 }
