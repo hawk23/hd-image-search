@@ -21,6 +21,12 @@ public class ImageSearch
     public static String NUM_RESULTS_KEY        = "numResults";
     public static int NUM_RESULTS               = 10;
 
+    /**
+     * search by hadoop image:  ImageSearch -h "/images/png2/1/1_i110.png"
+     * search by feature:       ImageSearch -f "1,0;3,0:1,0;0,0;....."
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception
     {
         String              sampleFile  = "/images/png2/1/1_i110.png"; // TODO: read from argmuments
