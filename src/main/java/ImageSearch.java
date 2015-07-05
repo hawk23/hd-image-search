@@ -19,29 +19,70 @@ public class ImageSearch
     public static String SAMPLE_HISTOGRAM_KEY   = "sampleHistogram";
     public static String SAMPLE_FILEPATH_KEY    = "sampleFilepath";
     public static String NUM_RESULTS_KEY        = "numResults";
-    public static int NUM_RESULTS               = 10;
+
+    private static final int NUM_RESULTS        = 10;
+    private static final String SAMPLE_FILE     = "/images/png2/1/1_i110.png";
 
     /**
-     * search by hadoop image:  ImageSearch -h "/images/png2/1/1_i110.png"
-     * search by feature:       ImageSearch -f "1,0;3,0:1,0;0,0;....."
+     * search by hadoop image:  ImageSearch -h "/images/png2/1/1_i110.png" -n 10
+     * search by feature:       ImageSearch -n 10 -f "1.0;3.0:1.0;0.0;....."
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception
     {
-        String              sampleFile  = "/images/png2/1/1_i110.png"; // TODO: read from argmuments
-        Path                samplePath  = new Path(sampleFile);
-        Configuration       conf        = new Configuration();
 
-        byte[]              sampleBytes = loadImage(samplePath, conf);
+        String              sampleFile      = SAMPLE_FILE;
+        Path                samplePath      = new Path(sampleFile);
+        Configuration       conf            = new Configuration();
+        ImageFeature        sampleFeature   = null;
+        int                 numResults      = NUM_RESULTS;
 
-        // create histogram of sample image
-        HistogramGenerator  histogramGenerator  = new HistogramGenerator();
-        ImageFeature        sampleFeature       = new ImageFeature(sampleFile, histogramGenerator.generate(sampleBytes));
+        // parse arguments
+        try {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-h")) {
+
+                    sampleFile = args[i + 1];
+                    samplePath = new Path(sampleFile);
+                    byte[] sampleBytes = loadImage(samplePath, conf);
+
+                    // create histogram of sample image
+                    HistogramGenerator histogramGenerator = new HistogramGenerator();
+                    sampleFeature = new ImageFeature(sampleFile, histogramGenerator.generate(sampleBytes));
+
+                } else if (args[i].equals("-f")) {
+
+                    // we do not know the filepath on the cluster as we only have the histogram values
+                    sampleFeature = new ImageFeature("", args[i + 1]);
+
+                } else if (args[i].equals("-n")) {
+
+                    numResults = Integer.valueOf(args[i + 1]);
+
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error parsing parameter arguments:");
+            e.printStackTrace();
+
+            System.out.println("Called with 'hadoop ImageSearch -h /pathToImageOnCluster [-n NumResults]'");
+            System.out.println("Or called with 'hadoop ImageSearch -f \"1.0;3.0:1.0;0.0;.....\" [-n NumResults]'");
+            System.exit(1);
+        }
+
+        // used for local testing in case of no parameter arguments
+        if (sampleFeature == null) {
+            byte[] sampleBytes = loadImage(samplePath, conf);
+
+            // create histogram of sample image
+            HistogramGenerator histogramGenerator = new HistogramGenerator();
+            sampleFeature = new ImageFeature(sampleFile, histogramGenerator.generate(sampleBytes));
+        }
 
         conf.set(SAMPLE_HISTOGRAM_KEY, sampleFeature.getHistogramString());
         conf.set(SAMPLE_FILEPATH_KEY, sampleFeature.getFilePath());
-        conf.set(NUM_RESULTS_KEY, String.valueOf(NUM_RESULTS));
+        conf.set(NUM_RESULTS_KEY, String.valueOf(numResults));
 
         Job             job     = Job.getInstance(conf, "extractFeatures");
         job.setJarByClass(ImageSearch.class);
