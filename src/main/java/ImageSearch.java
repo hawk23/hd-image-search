@@ -3,7 +3,6 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -56,7 +55,13 @@ public class ImageSearch
         job.setOutputFormatClass(TextOutputFormat.class);
 
         FileInputFormat.addInputPath(job, new Path("/index"));
-        FileOutputFormat.setOutputPath(job, new Path("/searchResult"));
+
+        //get the FileSystem
+        FileSystem fs = FileSystem.get(conf);
+
+        Path out = new Path("/searchResult");
+        FileOutputFormat.setOutputPath(job, out);
+        fs.delete(out, true);
 
         boolean result = job.waitForCompletion(true);
 

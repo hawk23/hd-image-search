@@ -13,14 +13,19 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
  * Created by mario on 03.07.15.
  */
 
-public class Main
+public class FeatureExtract
 {
     public static void main(String[] args) throws Exception
     {
         Configuration   conf    = new Configuration();
         Job             job     = Job.getInstance(conf, "extractFeatures");
 
-        job.setJarByClass(Main.class);
+        // this should be like defined in your mapred-site.xml
+        conf.set("mapreduce.jobtracker.address", "hdfs://localhost:54311");
+        // like defined in core-site.xml
+        conf.set("fs.defaultFS", "hdfs://localhost:54310");
+
+        job.setJarByClass(FeatureExtract.class);
 
         job.setMapperClass(ImageFeatureExtractMapper.class);
         job.setCombinerClass(ImageFeatureExtractReducer.class);
@@ -38,7 +43,7 @@ public class Main
         FileSystem fs= FileSystem.get(conf);
 
         //get the FileStatus list from given dir
-        FileStatus[] statusList = fs.listStatus(new Path("/images/png2"));
+        FileStatus[] statusList = fs.listStatus(new Path("hdfs://localhost:54310/images/png2"));
         if(statusList != null)
         {
             for(FileStatus status : statusList)
@@ -51,7 +56,9 @@ public class Main
             }
         }
 
-        FileOutputFormat.setOutputPath(job, new Path("/index"));
+        Path out = new Path("hdfs://localhost:54310/index");
+        FileOutputFormat.setOutputPath(job, out);
+        fs.delete(out, true);
 
         boolean result = job.waitForCompletion(true);
 
