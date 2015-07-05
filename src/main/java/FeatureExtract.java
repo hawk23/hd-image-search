@@ -15,15 +15,34 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class FeatureExtract
 {
+
+    private static final String IMAGES_PATH = "/images/png2";
+    private static final String OUTPUT_PATH = "/index";
+
+    /**
+     *
+     * @param args FeatureExtract /imagesFolderPath /outputFolderPath
+     *             FeatureExtract
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception
     {
+        String imagesPath = IMAGES_PATH;
+        String outputPath = OUTPUT_PATH;
+
+        if (args.length == 2) {
+            imagesPath = args[0];
+            outputPath = args[1];
+        }
+
+        if (args.length != 0 && args.length != 2) {
+            System.out.println("Wrong parameter numbers: " + args.length);
+            System.out.println("Called with 'hadoop FeatureExtract imagesFolderPath outputFolderPath'");
+            System.exit(1);
+        }
+
         Configuration   conf    = new Configuration();
         Job             job     = Job.getInstance(conf, "extractFeatures");
-
-        // this should be like defined in your mapred-site.xml
-        conf.set("mapreduce.jobtracker.address", "hdfs://localhost:54311");
-        // like defined in core-site.xml
-        conf.set("fs.defaultFS", "hdfs://localhost:54310");
 
         job.setJarByClass(FeatureExtract.class);
 
@@ -43,7 +62,7 @@ public class FeatureExtract
         FileSystem fs= FileSystem.get(conf);
 
         //get the FileStatus list from given dir
-        FileStatus[] statusList = fs.listStatus(new Path("hdfs://localhost:54310/images/png2"));
+        FileStatus[] statusList = fs.listStatus(new Path(imagesPath));
         if(statusList != null)
         {
             for(FileStatus status : statusList)
@@ -52,11 +71,11 @@ public class FeatureExtract
                 FileInputFormat.addInputPath(job, status.getPath());
 
                 // HACK --> just process first folder to prevent errors.
-                // break;
+                break;
             }
         }
 
-        Path out = new Path("hdfs://localhost:54310/index");
+        Path out = new Path(outputPath);
         FileOutputFormat.setOutputPath(job, out);
         fs.delete(out, true);
 
