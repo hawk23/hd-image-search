@@ -16,22 +16,27 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
  */
 public class ImageSearch
 {
-    public static String SAMPLE_HISTOGRAM_KEY   = "sampleHistogram";
-    public static String SAMPLE_FILEPATH_KEY    = "sampleFilepath";
-    public static String NUM_RESULTS_KEY        = "numResults";
+    public static String SAMPLE_HISTOGRAM_KEY       = "sampleHistogram";
+    public static String SAMPLE_FILEPATH_KEY        = "sampleFilepath";
+    public static String NUM_RESULTS_KEY            = "numResults";
 
-    private static final int NUM_RESULTS        = 10;
-    private static final String SAMPLE_FILE     = "/images/png2/1/1_i110.png";
+
+    private static final String INDEX_FOLDER_PATH   = "/index";
+    private static final String OUTPUT_PATH         = "/searchResult";
+    private static final int NUM_RESULTS            = 10;
+    private static final String SAMPLE_FILE         = "/images/png2/1/1_i110.png";
 
     /**
-     * search by hadoop image:  ImageSearch -h "/images/png2/1/1_i110.png" -n 10
-     * search by feature:       ImageSearch -n 10 -f "1.0;3.0:1.0;0.0;....."
+     * search by hadoop image:  ImageSearch /indexFolderPath /outputFolderPath -h "/images/png2/1/1_i110.png" -n 10
+     * search by feature:       ImageSearch /indexFolderPath /outputFolderPath -n 10 -f "1.0;3.0:1.0;0.0;....."
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception
     {
 
+        String              indexFolderPath = INDEX_FOLDER_PATH;
+        String              outputPath      = OUTPUT_PATH;
         String              sampleFile      = SAMPLE_FILE;
         Path                samplePath      = new Path(sampleFile);
         Configuration       conf            = new Configuration();
@@ -40,7 +45,12 @@ public class ImageSearch
 
         // parse arguments
         try {
-            for (int i = 0; i < args.length; i++) {
+            if (args.length >= 2) {
+                indexFolderPath = args[0];
+                outputPath = args[1];
+            }
+
+            for (int i = 2; i < args.length; i++) {
                 if (args[i].equals("-h")) {
 
                     sampleFile = args[i + 1];
@@ -66,8 +76,8 @@ public class ImageSearch
             System.out.println("Error parsing parameter arguments:");
             e.printStackTrace();
 
-            System.out.println("Called with 'hadoop ImageSearch -h /pathToImageOnCluster [-n NumResults]'");
-            System.out.println("Or called with 'hadoop ImageSearch -f \"1.0;3.0:1.0;0.0;.....\" [-n NumResults]'");
+            System.out.println("Called with 'hadoop ImageSearch /indexFolderPath /outputFolderPath -h /pathToImageOnCluster [-n NumResults]'");
+            System.out.println("Or called with 'hadoop ImageSearch /indexFolderPath /outputFolderPath -f \"1.0;3.0:1.0;0.0;.....\" [-n NumResults]'");
             System.exit(1);
         }
 
@@ -100,12 +110,12 @@ public class ImageSearch
         job.setInputFormatClass(KeyValueTextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
 
-        FileInputFormat.addInputPath(job, new Path("/index"));
+        FileInputFormat.addInputPath(job, new Path(indexFolderPath));
 
         //get the FileSystem
         FileSystem fs = FileSystem.get(conf);
 
-        Path out = new Path("/searchResult");
+        Path out = new Path(outputPath);
         FileOutputFormat.setOutputPath(job, out);
         fs.delete(out, true);
 
