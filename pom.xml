@@ -54,9 +54,19 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>FeatureExtract</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!--
                     <descriptors>
                         <descriptor>assembly/src.xml</descriptor>
                     </descriptors>
+                    -->
                 </configuration>
 
             </plugin>

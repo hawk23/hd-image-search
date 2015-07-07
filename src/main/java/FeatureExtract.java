@@ -42,6 +42,11 @@ public class FeatureExtract
         }
 
         Configuration   conf    = new Configuration();
+        conf.set("fs.default.name",     "hdfs://localhost:54310");
+        conf.set("mapred.job.tracker",  "localhost:54311");
+        conf.set("fs.hdfs.impl",        org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        conf.set("fs.file.impl",        org.apache.hadoop.fs.LocalFileSystem.class.getName());
+
         Job             job     = Job.getInstance(conf, "extractFeatures");
 
         job.setJarByClass(FeatureExtract.class);
