@@ -1,3 +1,5 @@
+package hdimagesearch.core;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,8 +29,8 @@ public class ImageSearch
     private static final String SAMPLE_FILE         = "/images/png2/1/1_i110.png";
 
     /**
-     * search by hadoop image:  ImageSearch /indexFolderPath /outputFolderPath -h "/images/png2/1/1_i110.png" -n 10
-     * search by feature:       ImageSearch /indexFolderPath /outputFolderPath -n 10 -f "1.0;3.0:1.0;0.0;....."
+     * search by hadoop image:  hdimagesearch.core.ImageSearch /indexFolderPath /outputFolderPath -h "/images/png2/1/1_i110.png" -n 10
+     * search by feature:       hdimagesearch.core.ImageSearch /indexFolderPath /outputFolderPath -n 10 -f "1.0;3.0:1.0;0.0;....."
      * @param args
      * @throws Exception
      */
@@ -76,8 +78,8 @@ public class ImageSearch
             System.out.println("Error parsing parameter arguments:");
             e.printStackTrace();
 
-            System.out.println("Called with 'hadoop ImageSearch /indexFolderPath /outputFolderPath -h /pathToImageOnCluster [-n NumResults]'");
-            System.out.println("Or called with 'hadoop ImageSearch /indexFolderPath /outputFolderPath -f \"1.0;3.0:1.0;0.0;.....\" [-n NumResults]'");
+            System.out.println("Called with 'hadoop hdimagesearch.core.ImageSearch /indexFolderPath /outputFolderPath -h /pathToImageOnCluster [-n NumResults]'");
+            System.out.println("Or called with 'hadoop hdimagesearch.core.ImageSearch /indexFolderPath /outputFolderPath -f \"1.0;3.0:1.0;0.0;.....\" [-n NumResults]'");
             System.exit(1);
         }
 

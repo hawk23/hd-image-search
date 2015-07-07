@@ -1,3 +1,5 @@
+package hdimagesearch.core;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -21,8 +23,8 @@ public class FeatureExtract
 
     /**
      *
-     * @param args FeatureExtract /imagesFolderPath /outputFolderPath
-     *             FeatureExtract
+     * @param args hdimagesearch.core.FeatureExtract /imagesFolderPath /outputFolderPath
+     *             hdimagesearch.core.FeatureExtract
      * @throws Exception
      */
     public static void main(String[] args) throws Exception
@@ -37,7 +39,7 @@ public class FeatureExtract
 
         if (args.length != 0 && args.length != 2) {
             System.out.println("Wrong parameter numbers: " + args.length);
-            System.out.println("Called with 'hadoop FeatureExtract imagesFolderPath outputFolderPath'");
+            System.out.println("Called with 'hadoop hdimagesearch.core.FeatureExtract imagesFolderPath outputFolderPath'");
             System.exit(1);
         }
 

@@ -1,4 +1,5 @@
-import org.apache.hadoop.io.LongWritable;
+package hdimagesearch.core;
+
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;

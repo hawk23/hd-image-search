@@ -1,3 +1,5 @@
+package hdimagesearch.core;
+
 import org.apache.hadoop.fs.Path;
 
 /**

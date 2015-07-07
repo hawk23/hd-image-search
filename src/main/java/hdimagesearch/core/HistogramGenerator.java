@@ -1,3 +1,5 @@
+package hdimagesearch.core;
+
 import net.semanticmetadata.lire.imageanalysis.CEDD;
 import net.semanticmetadata.lire.imageanalysis.ColorLayout;
 

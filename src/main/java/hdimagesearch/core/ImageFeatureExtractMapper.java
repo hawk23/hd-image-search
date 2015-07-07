@@ -1,3 +1,5 @@
+package hdimagesearch.core;
+
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -20,7 +22,7 @@ public class ImageFeatureExtractMapper extends Mapper<NullWritable, BytesWritabl
         HistogramGenerator histogramGenerator = new HistogramGenerator();
         double[] histogram = histogramGenerator.generate(imageByte);
 
-        // generate ImageFeature
+        // generate hdimagesearch.core.ImageFeature
         ImageFeature feature = new ImageFeature(filePath, histogram);
 
         // write filePath as key and double values of histogram as values
