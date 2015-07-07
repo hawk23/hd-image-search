@@ -5,19 +5,23 @@ package hdimagesearch.gui.events;
  */
 public class Event
 {
-    private String type;
+    private EventTypes type;
     private Object data;
 
-    public Event(String type, Object data) {
+    public Event(EventTypes type, Object data) {
         this.type = type;
         this.data = data;
     }
 
-    public String getType() {
+    public Event(EventTypes type) {
+        this(type, null);
+    }
+
+    public EventTypes getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EventTypes type) {
         this.type = type;
     }
 

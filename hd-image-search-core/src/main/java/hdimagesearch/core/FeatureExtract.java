@@ -27,7 +27,7 @@ public class FeatureExtract
      *             hdimagesearch.core.FeatureExtract
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception
+    public static int main(String[] args) throws Exception
     {
         String imagesPath = IMAGES_PATH;
         String outputPath = OUTPUT_PATH;
@@ -88,6 +88,6 @@ public class FeatureExtract
 
         boolean result = job.waitForCompletion(true);
 
-        System.exit(result ? 0 : 1);
+        return result ? 0 : 1;
     }
 }

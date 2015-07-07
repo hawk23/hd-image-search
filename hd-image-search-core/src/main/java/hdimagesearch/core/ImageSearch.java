@@ -34,9 +34,8 @@ public class ImageSearch
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception
+    public static int main(String[] args) throws Exception
     {
-
         String              indexFolderPath = INDEX_FOLDER_PATH;
         String              outputPath      = OUTPUT_PATH;
         String              sampleFile      = SAMPLE_FILE;
@@ -44,6 +43,11 @@ public class ImageSearch
         Configuration       conf            = new Configuration();
         ImageFeature        sampleFeature   = null;
         int                 numResults      = NUM_RESULTS;
+
+        conf.set("fs.default.name",     "hdfs://localhost:54310");
+        conf.set("mapred.job.tracker",  "localhost:54311");
+        conf.set("fs.hdfs.impl",        org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        conf.set("fs.file.impl",        org.apache.hadoop.fs.LocalFileSystem.class.getName());
 
         // parse arguments
         try {
@@ -123,10 +127,10 @@ public class ImageSearch
 
         boolean result = job.waitForCompletion(true);
 
-        System.exit(result ? 0 : 1);
+        return result ? 0 : 1;
     }
 
-    private static byte[] loadImage (Path path, Configuration conf) throws Exception
+    public static byte[] loadImage (Path path, Configuration conf) throws Exception
     {
         //get the FileSystem, you will need to initialize it properly
         FileSystem          fs          = FileSystem.get(conf);
@@ -143,6 +147,7 @@ public class ImageSearch
         finally
         {
             IOUtils.closeStream(in);
+            fs.close();
         }
 
         return sampleBytes;

@@ -1,5 +1,7 @@
 package hdimagesearch.gui.forms;
 
+import hdimagesearch.gui.events.Event;
+
 import java.util.Observable;
 
 /**
@@ -7,5 +9,8 @@ import java.util.Observable;
  */
 public abstract class DefaultForm extends Observable
 {
-
+    protected void dispatchEvent (Event event) {
+        setChanged();
+        notifyObservers(event);
+    }
 }
