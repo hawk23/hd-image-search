@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+hdimagesearch.gui.Main-Class: hdimagesearch.core.FeatureExtract
+
