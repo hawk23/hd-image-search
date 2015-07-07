@@ -43,6 +43,15 @@ public class FeatureExtract
             System.exit(1);
         }
 
+        Job job = createJob(imagesPath, outputPath);
+
+        boolean result = job.waitForCompletion(true);
+
+        return result ? 0 : 1;
+    }
+
+    private static Job createJob (String imagesPath, String outputPath) throws Exception
+    {
         Configuration   conf    = new Configuration();
         conf.set("fs.default.name",     "hdfs://localhost:54310");
         conf.set("mapred.job.tracker",  "localhost:54311");
@@ -78,7 +87,7 @@ public class FeatureExtract
                 FileInputFormat.addInputPath(job, status.getPath());
 
                 // HACK --> just process first folder to prevent errors.
-                break;
+                // break;
             }
         }
 
@@ -86,8 +95,6 @@ public class FeatureExtract
         FileOutputFormat.setOutputPath(job, out);
         fs.delete(out, true);
 
-        boolean result = job.waitForCompletion(true);
-
-        return result ? 0 : 1;
+        return job;
     }
 }
