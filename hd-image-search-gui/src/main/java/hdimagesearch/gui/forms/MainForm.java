@@ -27,6 +27,7 @@ public class MainForm extends DefaultForm
     private JLabel imgSample;
     private JButton btnExtractFeatures;
     private JList lstResult;
+    private JTextArea txtLog;
     private JFileChooser fileChooser = new JFileChooser();
 
 
@@ -117,5 +118,13 @@ public class MainForm extends DefaultForm
 
     public void setLstResult(JList lstResult) {
         this.lstResult = lstResult;
+    }
+
+    public JTextArea getTxtLog() {
+        return txtLog;
+    }
+
+    public void setTxtLog(JTextArea txtLog) {
+        this.txtLog = txtLog;
     }
 }

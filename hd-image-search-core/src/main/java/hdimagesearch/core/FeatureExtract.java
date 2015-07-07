@@ -87,13 +87,22 @@ public class FeatureExtract
                 FileInputFormat.addInputPath(job, status.getPath());
 
                 // HACK --> just process first folder to prevent errors.
-                // break;
+                break;
             }
         }
 
         Path out = new Path(outputPath);
         FileOutputFormat.setOutputPath(job, out);
         fs.delete(out, true);
+
+        return job;
+    }
+
+    public static Job featureExtract (String imagesPath, String outputPath) throws Exception
+    {
+        Job job = createJob(imagesPath, outputPath);
+
+        job.submit();
 
         return job;
     }

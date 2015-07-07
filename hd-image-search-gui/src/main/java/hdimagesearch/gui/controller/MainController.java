@@ -10,10 +10,12 @@ import hdimagesearch.gui.forms.MainForm;
 import hdimagesearch.gui.model.ClusterConfiguration;
 import hdimagesearch.gui.model.DB;
 import hdimagesearch.gui.model.ImageListItem;
+import hdimagesearch.gui.threading.JobWatcher;
 import hdimagesearch.gui.util.ImageListRenderer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
 import sun.awt.windows.ThemeReader;
 
 import javax.imageio.ImageIO;
@@ -33,6 +35,7 @@ public class MainController extends Controller
     private MainForm mainForm;
     private ImageFeature sampleFeatures;
     private HistogramGenerator histogramGenerator;
+    private LogController logController;
 
     public MainController(MainForm mainForm)
     {
@@ -53,6 +56,8 @@ public class MainController extends Controller
 
         this.mainForm.getLstResult().setCellRenderer(new ImageListRenderer());
         this.mainForm.getSpinner1().setValue(10);
+
+        this.logController = new LogController(this.mainForm.getTxtLog());
     }
 
     private void startSearch ()
@@ -64,11 +69,10 @@ public class MainController extends Controller
             Integer numResults = (Integer) this.mainForm.getSpinner1().getValue();
 
             // TODO: pass values (fsDefaultName, mapredJobTracker) from selectedConfig as parameters to ImageSearch.main
-            // TODO: show print statements in logging window
-            // TODO: Start search task in own thread
+            // TODO: Start search like ExtractFeature task using JobWatcher.
 
             try {
-                System.out.println("Start image search!");
+                logController.log("Start image search!");
 
                 int result = ImageSearch.main(new String[]{
                         selectedConfig.getIndexFolder(),
@@ -84,6 +88,7 @@ public class MainController extends Controller
                 }
             }
             catch (Exception ex) {
+                logController.error(ex.getMessage());
                 System.err.print(ex);
             }
         }
@@ -91,7 +96,7 @@ public class MainController extends Controller
 
     private void showSearchResults ()
     {
-        System.out.println("displaying search results.");
+        logController.log("displaying search results.");
 
         ClusterConfiguration selectedConfig = (ClusterConfiguration) this.mainForm.getCbCluster().getSelectedItem();
 
@@ -110,6 +115,7 @@ public class MainController extends Controller
                 String line;
                 line=br.readLine();
                 while (line != null){
+                    logController.log("result image: " + line);
                     System.out.println(line);
 
                     String searchResultImagePath = line.split("\t")[1];
@@ -133,6 +139,7 @@ public class MainController extends Controller
                 this.mainForm.getLstResult().setModel(listModel);
             }
             catch (Exception ex) {
+                logController.error(ex.getMessage());
                 System.err.print(ex);
             }
         }
@@ -154,6 +161,7 @@ public class MainController extends Controller
                 this.mainForm.getTxtInputImage().setText(file.getPath());
             }
             catch (Exception ex) {
+                logController.error(ex.getMessage());
                 System.err.print(ex);
             }
         }
@@ -165,25 +173,17 @@ public class MainController extends Controller
 
         if (selectedConfig != null)
         {
-            // TODO: add textbox below tab panel as log output window to display following (and all other) logs
-            System.out.println("Start extracting features!");
+            try {
+                logController.log("Start extracting features!");
+                final Job job = FeatureExtract.featureExtract(selectedConfig.getImageFolder(), selectedConfig.getIndexFolder());
 
-            Thread t = new Thread() {
-                public void run() {
-                    try {
-                        FeatureExtract.main(new String[]{selectedConfig.getImageFolder(), selectedConfig.getIndexFolder()});
-                    }
-                    catch (Exception ex)  {
-                        System.err.print(ex);
-                    }
-                }
-            };
-            t.start();
-
-            System.out.println("Features extracted!");
-
-            // TODO: maybe show progress bar indicating job status. how?
-
+                JobWatcher watcher = new JobWatcher(job, logController);
+                watcher.start();
+            }
+            catch (Exception ex) {
+                logController.error(ex.getMessage());
+                System.err.print(ex);
+            }
         }
     }
 
