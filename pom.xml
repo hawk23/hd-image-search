@@ -56,7 +56,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>FeatureExtract</mainClass>
+                            <mainClass>hdimagesearch.core.FeatureExtract</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
