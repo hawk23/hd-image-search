@@ -27,8 +27,10 @@ public class FeatureExtract
      *             hdimagesearch.core.FeatureExtract
      * @throws Exception
      */
-    public static int main(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
+        Configuration conf = new Configuration();
+
         String imagesPath = IMAGES_PATH;
         String outputPath = OUTPUT_PATH;
 
@@ -43,21 +45,15 @@ public class FeatureExtract
             System.exit(1);
         }
 
-        Job job = createJob(imagesPath, outputPath);
+        Job job = createJob(imagesPath, outputPath, conf);
 
         boolean result = job.waitForCompletion(true);
 
-        return result ? 0 : 1;
+        System.exit(result ? 0 : 1);
     }
 
-    private static Job createJob (String imagesPath, String outputPath) throws Exception
+    private static Job createJob (String imagesPath, String outputPath, Configuration conf) throws Exception
     {
-        Configuration   conf    = new Configuration();
-        conf.set("fs.default.name",     "hdfs://localhost:54310");
-        conf.set("mapred.job.tracker",  "localhost:54311");
-        conf.set("fs.hdfs.impl",        org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-        conf.set("fs.file.impl",        org.apache.hadoop.fs.LocalFileSystem.class.getName());
-
         Job             job     = Job.getInstance(conf, "extractFeatures");
 
         job.setJarByClass(FeatureExtract.class);
@@ -98,9 +94,9 @@ public class FeatureExtract
         return job;
     }
 
-    public static Job featureExtract (String imagesPath, String outputPath) throws Exception
+    public static Job featureExtract (String imagesPath, String outputPath, Configuration conf) throws Exception
     {
-        Job job = createJob(imagesPath, outputPath);
+        Job job = createJob(imagesPath, outputPath, conf);
 
         job.submit();
 

@@ -74,16 +74,13 @@ public class MainController extends Controller
             try {
                 logController.log("Start image search!");
 
-                int result = ImageSearch.main(new String[]{
-                        selectedConfig.getIndexFolder(),
-                        selectedConfig.getSearchResultFolder(),
-                        "-n",
-                        numResults.toString(),
-                        "-f",
-                        this.sampleFeatures.getHistogramString()}
-                );
+                final Job job = ImageSearch.imageSearch(selectedConfig.getIndexFolder(), selectedConfig.getSearchResultFolder(), numResults, this.sampleFeatures.getHistogramString(), selectedConfig.getHadoopConfig());
 
-                if (result == 0) {
+                JobWatcher watcher = new JobWatcher(job, logController);
+                watcher.start();
+                watcher.join();
+
+                if (job.isComplete()) {
                     this.showSearchResults();
                 }
             }
@@ -101,11 +98,7 @@ public class MainController extends Controller
         ClusterConfiguration selectedConfig = (ClusterConfiguration) this.mainForm.getCbCluster().getSelectedItem();
 
         if (selectedConfig != null) {
-            Configuration conf    = new Configuration();
-            conf.set("fs.default.name",     selectedConfig.getFsDefaultName());
-            conf.set("mapred.job.tracker",  selectedConfig.getMapredJobTracker());
-            conf.set("fs.hdfs.impl",        org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-            conf.set("fs.file.impl",        org.apache.hadoop.fs.LocalFileSystem.class.getName());
+            Configuration conf    = selectedConfig.getHadoopConfig();
 
             try {
                 FileSystem fs= FileSystem.get(conf);
@@ -175,7 +168,7 @@ public class MainController extends Controller
         {
             try {
                 logController.log("Start extracting features!");
-                final Job job = FeatureExtract.featureExtract(selectedConfig.getImageFolder(), selectedConfig.getIndexFolder());
+                final Job job = FeatureExtract.featureExtract(selectedConfig.getImageFolder(), selectedConfig.getIndexFolder(), selectedConfig.getHadoopConfig());
 
                 JobWatcher watcher = new JobWatcher(job, logController);
                 watcher.start();

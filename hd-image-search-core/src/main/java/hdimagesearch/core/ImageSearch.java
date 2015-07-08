@@ -34,20 +34,15 @@ public class ImageSearch
      * @param args
      * @throws Exception
      */
-    public static int main(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
         String              indexFolderPath = INDEX_FOLDER_PATH;
         String              outputPath      = OUTPUT_PATH;
         String              sampleFile      = SAMPLE_FILE;
         Path                samplePath      = new Path(sampleFile);
-        Configuration       conf            = new Configuration();
         ImageFeature        sampleFeature   = null;
         int                 numResults      = NUM_RESULTS;
-
-        conf.set("fs.default.name",     "hdfs://localhost:54310");
-        conf.set("mapred.job.tracker",  "localhost:54311");
-        conf.set("fs.hdfs.impl",        org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-        conf.set("fs.file.impl",        org.apache.hadoop.fs.LocalFileSystem.class.getName());
+        Configuration       conf            = new Configuration();
 
         // parse arguments
         try {
@@ -96,11 +91,20 @@ public class ImageSearch
             sampleFeature = new ImageFeature(sampleFile, histogramGenerator.generate(sampleBytes));
         }
 
+        Job job = createJob(indexFolderPath, outputPath, numResults, conf, sampleFeature);
+
+        boolean result = job.waitForCompletion(true);
+
+        System.exit(result ? 0 : 1);
+    }
+
+    private static synchronized Job createJob (String indexFolderPath, String outputPath, int numResults, Configuration conf, ImageFeature sampleFeature) throws Exception
+    {
         conf.set(SAMPLE_HISTOGRAM_KEY, sampleFeature.getHistogramString());
         conf.set(SAMPLE_FILEPATH_KEY, sampleFeature.getFilePath());
         conf.set(NUM_RESULTS_KEY, String.valueOf(numResults));
 
-        Job             job     = Job.getInstance(conf, "extractFeatures");
+        Job             job     = Job.getInstance(conf, "imageSearch");
         job.setJarByClass(ImageSearch.class);
 
         // use only one reducer
@@ -125,9 +129,15 @@ public class ImageSearch
         FileOutputFormat.setOutputPath(job, out);
         fs.delete(out, true);
 
-        boolean result = job.waitForCompletion(true);
+        return job;
+    }
 
-        return result ? 0 : 1;
+    public static Job imageSearch (String indexPath, String outputPath, int numResults, String feature, Configuration conf) throws Exception
+    {
+        Job job = createJob(indexPath, outputPath, numResults, conf, new ImageFeature("external image", feature));
+        job.submit();
+
+        return job;
     }
 
     public static byte[] loadImage (Path path, Configuration conf) throws Exception

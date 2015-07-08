@@ -194,7 +194,9 @@
             <children>
               <component id="20b76" class="javax.swing.JTextArea" binding="txtLog">
                 <constraints/>
-                <properties/>
+                <properties>
+                  <editable value="false"/>
+                </properties>
               </component>
             </children>
           </scrollpane>
