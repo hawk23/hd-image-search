@@ -118,8 +118,7 @@ public class MainController extends Controller
 
                 br.close();
                 fs.close();
-
-                // TODO: display search results more beautiful: e.g. text below images
+                
                 DefaultListModel listModel = new DefaultListModel();
 
                 for (String result : results) {
