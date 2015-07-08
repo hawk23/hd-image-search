@@ -123,7 +123,7 @@ public class MainController extends Controller
                 DefaultListModel listModel = new DefaultListModel();
 
                 for (String result : results) {
-                    byte[] searchResultImageBytes = ImageSearch.loadImage(new Path(result), conf);
+                    BufferedImage searchResultImageBytes = resize(ImageSearch.loadImage(new Path(result), conf), 120);
 
                     ImageListItem imageListItem = new ImageListItem(result, searchResultImageBytes);
                     listModel.addElement(imageListItem);
@@ -150,7 +150,7 @@ public class MainController extends Controller
                 byte[] imageByte = Files.readAllBytes(file.toPath());
                 double[] features = histogramGenerator.generate(imageByte);
                 this.sampleFeatures = new ImageFeature(file.getPath(), features);
-                this.mainForm.getImgSample().setIcon(new ImageIcon(imageByte));
+                this.mainForm.getImgSample().setIcon(new ImageIcon(resize(imageByte, 120)));
                 this.mainForm.getTxtInputImage().setText(file.getPath());
             }
             catch (Exception ex) {
@@ -178,6 +178,39 @@ public class MainController extends Controller
                 System.err.print(ex);
             }
         }
+    }
+
+    public static BufferedImage resize (byte[] imageByte, double size) {
+
+        // convert byte array to BufferedImage
+        InputStream in = new ByteArrayInputStream(imageByte);
+        BufferedImage bufferedImage = null;
+
+        try {
+            bufferedImage = ImageIO.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int width = 0;
+        int height = 0;
+
+        // preserve aspect ration
+        if (bufferedImage.getWidth() > bufferedImage.getHeight()) {
+            width = (int) size;
+            height = (int) (bufferedImage.getHeight() / (bufferedImage.getWidth() / size));
+        }
+        else {
+            width = (int) (bufferedImage.getWidth() / (bufferedImage.getHeight() / size));
+            height = (int) size;
+        }
+
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
+        Graphics2D g2d = (Graphics2D) bi.createGraphics();
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.drawImage(bufferedImage, 0, 0, width, height, null);
+        g2d.dispose();
+        return bi;
     }
 
     @Override

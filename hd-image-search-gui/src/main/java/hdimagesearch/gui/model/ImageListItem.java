@@ -1,5 +1,6 @@
 package hdimagesearch.gui.model;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 /**
@@ -8,9 +9,9 @@ import java.util.Arrays;
 public class ImageListItem {
 
     private String filename;
-    private byte[] image;
+    private BufferedImage image;
 
-    public ImageListItem(String filename, byte[] image) {
+    public ImageListItem(String filename, BufferedImage image) {
         this.filename = filename;
         this.image = image;
     }
@@ -23,11 +24,11 @@ public class ImageListItem {
         this.filename = filename;
     }
 
-    public byte[] getImage() {
+    public BufferedImage getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(BufferedImage image) {
         this.image = image;
     }
 
