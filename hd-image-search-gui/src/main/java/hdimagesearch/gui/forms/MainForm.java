@@ -28,6 +28,7 @@ public class MainForm extends DefaultForm
     private JButton btnExtractFeatures;
     private JList lstResult;
     private JTextArea txtLog;
+    private JButton btnAdd;
     private JFileChooser fileChooser = new JFileChooser();
 
 
@@ -51,6 +52,13 @@ public class MainForm extends DefaultForm
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Event event = new Event(EventTypes.EXTRACT_FEATURES);
+                dispatchEvent(event);
+            }
+        });
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Event event = new Event(EventTypes.ADD_CONFIG);
                 dispatchEvent(event);
             }
         });

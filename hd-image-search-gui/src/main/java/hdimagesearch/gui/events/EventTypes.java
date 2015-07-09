@@ -7,5 +7,6 @@ public enum EventTypes
 {
     START_SEARCH,
     SELECT_INPUT_IMAGE,
-    EXTRACT_FEATURES
+    EXTRACT_FEATURES,
+    ADD_CONFIG
 }

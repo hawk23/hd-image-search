@@ -7,6 +7,7 @@ import hdimagesearch.core.ImageSearch;
 import hdimagesearch.gui.events.Event;
 import hdimagesearch.gui.events.EventTypes;
 import hdimagesearch.gui.forms.MainForm;
+import hdimagesearch.gui.forms.NewClusterConfig;
 import hdimagesearch.gui.model.ClusterConfiguration;
 import hdimagesearch.gui.model.DB;
 import hdimagesearch.gui.model.ImageListItem;
@@ -118,7 +119,7 @@ public class MainController extends Controller
 
                 br.close();
                 fs.close();
-                
+
                 DefaultListModel listModel = new DefaultListModel();
 
                 for (String result : results) {
@@ -212,6 +213,25 @@ public class MainController extends Controller
         return bi;
     }
 
+    private void addConfig ()
+    {
+        NewClusterConfig newClusterConfig = new NewClusterConfig();
+        newClusterConfig.pack();
+        newClusterConfig.setVisible(true);
+
+        if (newClusterConfig.getClusterConfiguration() != null) {
+            ClusterConfiguration conf = newClusterConfig.getClusterConfiguration();
+            DB.instance().getClusterConfigurations().add(conf);
+            this.mainForm.getCbCluster().addItem(conf);
+
+            logController.log("Added new Configuration");
+        }
+        else {
+            logController.error("No new Configuration could be added.");
+        }
+
+    }
+
     @Override
     public void update(Observable observable, Object o) {
         if (o instanceof Event) {
@@ -227,6 +247,9 @@ public class MainController extends Controller
                     break;
                 case EXTRACT_FEATURES:
                     this.extractFeatures();
+                    break;
+                case ADD_CONFIG:
+                    this.addConfig();
                     break;
             }
         }

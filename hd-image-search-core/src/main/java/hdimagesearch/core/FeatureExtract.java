@@ -82,8 +82,8 @@ public class FeatureExtract
                 //add each dir to the list of inputs for the map-reduce job
                 FileInputFormat.addInputPath(job, status.getPath());
 
-                // HACK --> just process first folder to prevent errors.
-                break;
+                // WORKAROUND --> just process first folder to prevent errors. comment to have full indexing.
+                // break;
             }
         }
 
