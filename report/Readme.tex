@@ -100,7 +100,7 @@ https://github.com/hawk23/hd-image-search
 \subsection{hd-image-search-core}
 Dieses Modul beinhaltet die MapReduce Task um Features zu extrahieren und für die Bildsuche an sich. Das zugehörige jar File \lstinline$hd-core.jar$ bedfindet sich im Ordner \lstinline$jars$.
 
-\subsubsection{Verwendung}
+\subsubsection{Verwendung}\label{chapterVerwendung}
 Um die MapReduce tasks in einem Hadoop Cluster ausführen zu können muss das entsprechende jar file zuerst bekannt gegeben werden:
 \begin{lstlisting}
 $ export HADOOP_CLASSPATH=/home/hduser/jars/hd-core.jar
@@ -111,7 +111,7 @@ Features können mit folgendem Befehl extrahiert werden. Der erste Parameter ist
 $ hadoop hdimagesearch.core.FeatureExtract /images/png2 /index
 \end{lstlisting}
 
-Um ein Bildsuche zu starten können folgende Befehle ausgeführt werden. Als erster Parameter muss man den Ordner angeben in dem sich der Index befindet, dann den Ordner in dem das Suchergebnis gespeichert werden soll. Mit \lstinline$-n$ kann man die Anzahl der gewünschten Suchergenisse angeben. Als Suchbild kann man entweder ein bereits im Hadoop Cluster gespeichertes Bild angeben (\lstinline$-h "/images/png2/1/1_i110.png"$) oder einen Featurestring, wenn man bereits die Features eines Bildes extrahiert hat (\lstinline$-f "1.0;3.0:1.0;0.0;....."$).
+Um eine Bildsuche zu starten können folgende Befehle ausgeführt werden. Als erster Parameter muss man den Ordner angeben in dem sich der Index befindet, dann den Ordner in dem das Suchergebnis gespeichert werden soll. Mit \lstinline$-n$ kann man die Anzahl der gewünschten Suchergenisse angeben. Als Suchbild kann man entweder ein bereits im Hadoop Cluster gespeichertes Bild angeben (\lstinline$-h "/images/png2/1/1_i110.png"$) oder einen Featurestring, wenn man bereits die Features eines Bildes extrahiert hat (\lstinline$-f "1.0;3.0:1.0;0.0;....."$).
 
 \begin{lstlisting}
 $ hadoop hdimagesearch.core.ImageSearch /index /searchResult -n 10 -h "/images/png2/1/1_i110.png"
@@ -135,7 +135,7 @@ $ 4.69041575 hdfs://localhost:54310/images/png2/1/1_i190.png
 \end{lstlisting}
 
 \subsection{hd-image-search-gui}
-Diese Modul beinhaltet die grafische Benutzeroberfläche um Features zu extrahieren und um eine Bildsuche durchzuführen. Das Modul baut auf \lstinline$hd-image-search-core$ auf und nutzt die dort definierten MapReduce Tasks. Das jar file, mit dem sich die Benutzeroberfläche starten lässt, findet man unter \lstinline$jars/hd-gui.jar$.
+Dieses Modul beinhaltet die grafische Benutzeroberfläche um Features zu extrahieren und um eine Bildsuche durchzuführen. Das Modul baut auf \lstinline$hd-image-search-core$ auf und nutzt die dort definierten MapReduce Tasks. Das jar file, mit dem sich die Benutzeroberfläche starten lässt, findet man unter \lstinline$jars/hd-gui.jar$.
 
 Gestartet werden kann die GUI einfach mit:
 \begin{lstlisting}
@@ -144,7 +144,7 @@ $ java -jar hd-gui.jar
 
 Zuerst muss man auswählen auf welchem Cluster man die Operationen ausführen mächte. Im oberen Bereich der Benutzeroberfläche findet man dazu eine Auswahlbox um die gewünschte Clusterkonfiguration auszuwählen. Über den Button \emph{Add Config ...} kann man schnell eine neue Konfiguration anlegen.
 
-Um Features extrahieren zu könne muss man unter dem Tab \emph{Feature Extract} auf den Button \emph{Extract Features} klicken. Im Log Fenster im unteren Bereich der Oberfläche werden Logeinträge zu Erfolgs- und Fehlerfällen ausgegeben (Abbildung \ref{fig:s1}).
+Um Features extrahieren zu können muss man unter dem Tab \emph{Feature Extract} auf den Button \emph{Extract Features} klicken. Im Log Fenster im unteren Bereich der Oberfläche werden Logeinträge zu Erfolgs- und Fehlerfällen ausgegeben (Abbildung \ref{fig:s1}).
 
 Für die Bildersuche muss zuerst unter dem Tab \emph{Search} mittels \emph{Select Image ...} ein Bild aus dem lokalen Dateisystem ausgewählt werden. Das Bild wird als Vorschau rechts neben den Einstellungen angezeigt. Weiters kann man auch die Anzahl der gewünschten Ergebnisse angeben. Mit einem Klick auf \emph{Start Search} kann die Suche gestartet werden und die Ergebnisse werden angezeigt (Abbildung \ref{fig:s2}).
 
@@ -163,6 +163,36 @@ Für die Bildersuche muss zuerst unter dem Tab \emph{Search} mittels \emph{Selec
 	\label{fig:s2}
 \end{center}
 \end{figure}
+
+\subsection{Verwenden des Uni Clusters}
+Das erzeugte jar File wurde auch auf dem Uni Cluster octopus-itec.aau.at getestet. Die in \ref{chapterVerwendung} beschriebenen Kommandos können dort mit Anpassung auf die Dateipfade ausgeführt werden.
+
+\subsection{Aufsetzen eines verteilten Multi Node Clusters}
+Hadoop wurde zudem auf zwei virtuellen Maschinen auf Virtualbox (jeweils Ubuntu 14.04) aufgesetzt. Dabei ist eine virtuelle Maschine Master und Slave Node zugleich und die andere nur Slave Node. Damit die beiden virtuellen Maschinen miteinander kommunizieren können, wurde ein Host-Only Network \lstinline$vboxnet0$ aufgesetzt. Die Einstellungen sind in \ref{fig:s3} zu sehen. Den virtuellen Maschinen wurden somit die IP-Addressen 192.168.100.1 und 192.168.100.2 zugeteilt. 
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/screen3}
+	\caption{Einstellungen für das Host-Only Network}
+	\label{fig:s3}
+\end{center}
+\end{figure}
+
+Der Master Node hat sowohl den \emph{NameNode} Daemon für das HDFS laufen als auch den \emph{RessourceManager} (früher \emph{JobTracker}) für das MapReduce. Beide Maschinen haben die Slave Daemons laufen: \emph{DataNode} auf dem HDFS Layer und den \emph{TaskManager} auf dem MapReduce Layer. 
+
+Dies muss in den Konfigurationsdateien angepasst werden. So müssen die Dateien \lstinline$core-site.xml$, \lstinline$mapred-site.xml$ and \lstinline$hdfs-site.xml$ auf beiden Knoten verändert werden und die \lstinline$masters$ und \lstinline$slaves$-Dateien auf dem Master.
+
+In \ref{fig:s4} sind die laufenden Daemons nach dem Ausführen von \lstinline$start-dfs.sh$ und \lstinline$start-yarn.sh$ auf dem Master Node zu sehen. 
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/screen4}
+	\caption{Daemons auf MasterNode und SlaveNode}
+	\label{fig:s4}
+\end{center}
+\end{figure}
+
+Nachdem das jar File auf die virtuelle Maschine geladen wurde, kann es wie unter \ref{chapterVerwendung} beschrieben, verwendet werden.
 
 \section{Erledigte Aufgaben}
 Von den zu erledigenden Aufgaben haben wir alle Plichtaufgaben (1. - 4.) erfüllt. Von den Zusatzaufgaben haben wir umgesetzt:
