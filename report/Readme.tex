@@ -165,29 +165,30 @@ Für die Bildersuche muss zuerst unter dem Tab \emph{Search} mittels \emph{Selec
 \end{figure}
 
 \subsection{Verwenden des Uni Clusters}
-Das erzeugte jar File wurde auch auf dem Uni Cluster octopus-itec.aau.at getestet. Die in \ref{chapterVerwendung} beschriebenen Kommandos können dort mit Anpassung auf die Dateipfade ausgeführt werden.
+Das erzeugte jar File wurde auch auf dem Uni Cluster octopus-itec.aau.at getestet. Die in \ref{chapterVerwendung} beschriebenen Kommandos können dort (nach Anpassung der Dateipfade) ausgeführt werden.
 
 \subsection{Aufsetzen eines verteilten Multi Node Clusters}
-Hadoop wurde zudem auf zwei virtuellen Maschinen auf Virtualbox (jeweils Ubuntu 14.04) aufgesetzt. Dabei ist eine virtuelle Maschine Master und Slave Node zugleich und die andere nur Slave Node. Damit die beiden virtuellen Maschinen miteinander kommunizieren können, wurde ein Host-Only Network \lstinline$vboxnet0$ aufgesetzt. Die Einstellungen sind in \ref{fig:s3} zu sehen. Den virtuellen Maschinen wurden somit die IP-Addressen 192.168.100.1 und 192.168.100.2 zugeteilt. 
+Hadoop wurde zudem auf zwei virtuellen Maschinen auf Virtualbox (jeweils Ubuntu 14.04) aufgesetzt. Dabei ist eine virtuelle Maschine Master und Slave zugleich und die andere nur ein Slave. 
+Damit die beiden virtuellen Maschinen miteinander kommunizieren können, wurde ein Host-Only Network \lstinline$vboxnet0$ aufgesetzt. Die Einstellungen sind in Abbildung \ref{fig:s3} zu sehen. Den virtuellen Maschinen konnte somit statische IP-Addressen zugeteilt werden.
 
 \begin{figure}[H]
 \begin{center}
-	\includegraphics[width=\textwidth]{images/screen3}
+	\includegraphics[height=300pt]{images/screen3}
 	\caption{Einstellungen für das Host-Only Network}
 	\label{fig:s3}
 \end{center}
 \end{figure}
 
-Der Master Node hat sowohl den \emph{NameNode} Daemon für das HDFS laufen als auch den \emph{RessourceManager} (früher \emph{JobTracker}) für das MapReduce. Beide Maschinen haben die Slave Daemons laufen: \emph{DataNode} auf dem HDFS Layer und den \emph{TaskManager} auf dem MapReduce Layer. 
+Der Master Node hat sowohl den \emph{NameNode} Daemon für das HDFS laufen als auch den \emph{ResourceManager} (früher \emph{JobTracker}) für das MapReduce. Beide Maschinen haben die Slave Daemons laufen: \emph{DataNode} auf dem HDFS Layer und den \emph{NodeManager} auf dem MapReduce Layer. 
 
 Dies muss in den Konfigurationsdateien angepasst werden. So müssen die Dateien \lstinline$core-site.xml$, \lstinline$mapred-site.xml$ and \lstinline$hdfs-site.xml$ auf beiden Knoten verändert werden und die \lstinline$masters$ und \lstinline$slaves$-Dateien auf dem Master.
 
-In \ref{fig:s4} sind die laufenden Daemons nach dem Ausführen von \lstinline$start-dfs.sh$ und \lstinline$start-yarn.sh$ auf dem Master Node zu sehen. 
+In Abbildung \ref{fig:s4} sind die laufenden Daemons nach dem Ausführen von \lstinline$start-dfs.sh$ und \lstinline$start-yarn.sh$ auf dem Master Node zu sehen. 
 
 \begin{figure}[H]
 \begin{center}
 	\includegraphics[width=\textwidth]{images/screen4}
-	\caption{Daemons auf MasterNode und SlaveNode}
+	\caption{Daemons auf SlaveNode (links) und MasterNode (rechts)}
 	\label{fig:s4}
 \end{center}
 \end{figure}
